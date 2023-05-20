@@ -4,20 +4,21 @@ using Bulky.DataAccess.Repository.IRepository;
 using Bulky.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BulkyWeb.Controllers;
+namespace BulkyWeb.Areas.Admin.Controllers;
 
+[Area("Admin")]
 public class CategoryController : Controller
 {
-    private readonly ICategoryRepository _repo;
-    public CategoryController(ICategoryRepository repo)
+    private readonly IUnitOfWork _unitOfWork;
+    public CategoryController(IUnitOfWork unitOfWork)
     {
-        _repo = repo;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet]
     public IActionResult Index()
     {
-        List<Category> categoryList = _repo.GetAll().ToList();
+        List<Category> categoryList = _unitOfWork.Category.GetAll().ToList();
         return View(categoryList);
     }
     [HttpGet]
@@ -27,16 +28,16 @@ public class CategoryController : Controller
     }
 
     [HttpPost]
-    public IActionResult Create(Category newCategory)
+    public IActionResult Create(Category obj)
     {
-        if (newCategory.Name == newCategory.DisplayOrder.ToString())
+        if (obj.Name == obj.DisplayOrder.ToString())
         {
             ModelState.AddModelError("Name", "The Display Order cannot exactly match the name");
         }
         if (ModelState.IsValid)
         {
-            _repo.Add(newCategory);
-            _repo.Save();
+            _unitOfWork.Category.Add(obj);
+            _unitOfWork.Save();
             TempData["success"] = "Category created successfully";
             return RedirectToAction("Index", "Category");
         }
@@ -49,20 +50,18 @@ public class CategoryController : Controller
         {
             return BadRequest();
         }
-        //Category cat = _db.Categories.FirstOrDefault(c => c.Id == id);
-        //Category cat = _db.Categories.Where(c => c.Id == id).FirstOrDefault();
-        Category? cat = _repo.Get(c => c.Id == id);
-        if (cat == null) return NotFound();
-        return View(cat);
+        Category? obj = _unitOfWork.Category.Get(o => o.Id == id);
+        if (obj == null) return NotFound();
+        return View(obj);
     }
-    
+
     [HttpPost]
-    public IActionResult Edit(Category cat)
+    public IActionResult Edit(Category obj)
     {
         if (ModelState.IsValid)
         {
-            _repo.Update(cat);
-            _repo.Save();
+            _unitOfWork.Category.Update(obj);
+            _unitOfWork.Save();
             TempData["success"] = "Category updated successfully";
             return RedirectToAction("Index");
         }
@@ -76,23 +75,22 @@ public class CategoryController : Controller
         {
             return BadRequest();
         }
-        Category? cat = _repo.Get(c => c.Id == id);
-        if (cat == null) return NotFound();
-        return View(cat);
+        Category? obj = _unitOfWork.Category.Get(o => o.Id == id);
+        if (obj == null) return NotFound();
+        return View(obj);
     }
 
     [HttpPost, ActionName("Delete")]
     public IActionResult DeletePOST(int? id)
     {
-        Category? cat = _repo.Get(c => c.Id == id);
-        if (cat == null)
+        Category? obj = _unitOfWork.Category.Get(o => o.Id == id);
+        if (obj == null)
         {
             return NotFound();
         }
-        _repo.Remove(cat);
-        _repo.Save();
+        _unitOfWork.Category.Remove(obj);
+        _unitOfWork.Save();
         TempData["success"] = "Category deleted successfully";
         return RedirectToAction("Index");
-
     }
 }
