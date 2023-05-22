@@ -13,32 +13,26 @@
             <div class="col-6">
             </div>
             <div class="col-6 text-end">
-                <a asp-area="Admin" asp-controller="Product" asp-action="Create" class="btn btn-primary"> <i class="bi bi-plus-circle"></i>Add New Product</a>
+                <a asp-area="Admin" asp-controller="Product" asp-action="Upsert" class="btn btn-primary"> <i class="bi bi-plus-circle"></i>Add New Product</a>
             </div>
         </div>
-        <table class="table table-bordered table-striped">
+        <table id="tblData" class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th>Title</th>
-                    <th>Category</th>
-                    <th>Description</th>
                     <th>ISBN</th>
+                    <th>Price</th>
                     <th>Author</th>
-                    <th>List Price</th>
-                    <th>Price 0-49</th>
-                    <th>Price 50-99</th>
-                    <th>Price 100+</th>
-
+                    <th>Category</th>
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (Product product in Model.OrderBy(p => p.Title))
+@*              <tbody>
+                  @foreach (Product product in Model.OrderBy(p => p.Title))
                 {
                     <tr>
                         <td>@product.Title</td>
-                        <td>@product.Title</td>
-                        <td>@product.Description</td>
+                        <td>@product.Category.Name</td>
                         <td>@product.ISBN</td>
                         <td>@product.Author</td>
                         <td>@product.ListPrice</td>
@@ -47,14 +41,17 @@
                         <td>@product.Price100</td>
                         <td>
                             <div class="w-75 btn-group" role="group">
-                                <a asp-area="Admin" asp-controller="Product" asp-action="Edit" asp-route-Id="@product.Id" class="btn btn-primary mx-2"><i class="bi bi-pencil-square"></i> Edit</a>
+                                <a asp-area="Admin" asp-controller="Product" asp-action="Upsert" asp-route-Id="@product.Id" class="btn btn-primary mx-2"><i class="bi bi-pencil-square"></i> Edit</a>
                                 <a asp-area="Admin" asp-controller="Product" asp-action="Delete" asp-route-Id="@product.Id" class="btn btn-danger mx-2"><i class="bi bi-trash"></i>Delete</a>
                             </div>
                         </td>
                     </tr>
                 }
-            </tbody>
-        </table>
-
+             </tbody>
+ *@        </table>
     </div>
 </div>
+
+@section Scripts{
+    <script src="~/js/product.js"></script>
+}
