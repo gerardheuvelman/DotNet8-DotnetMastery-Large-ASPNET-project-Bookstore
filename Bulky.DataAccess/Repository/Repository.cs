@@ -8,6 +8,7 @@ using Bulky.DataAccess.Data;
 using Bulky.DataAccess.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Bulky.DataAccess.Repository;
 
@@ -33,9 +34,18 @@ public class Repository<T> : IRepository<T> where T : class
     }
 
     // includeProperties is a CSV string
-    public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
+    public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
     {
-        IQueryable<T> query = dbSet.Where(filter);
+        IQueryable<T> query;
+        if (tracked)
+        {
+            query = dbSet;
+        }
+        else
+        {
+            query = dbSet.AsNoTracking();
+        }
+        query = query.Where(filter);
         if (!string.IsNullOrEmpty(includeProperties))
         {
             foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -43,14 +53,17 @@ public class Repository<T> : IRepository<T> where T : class
                 query = query.Include(includeProp);
             }
         }
-
         return query.FirstOrDefault();
     }
 
     // includeProperties is a CSV string
-    public IEnumerable<T> GetAll(string? includeProperties = null)
+    public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter, string? includeProperties = null)
     {
         IQueryable<T> query = dbSet;
+        if (filter != null)
+        {
+           query = query.Where(filter);
+        }
         if (!string.IsNullOrEmpty(includeProperties))
         {
             foreach (var includeProp in includeProperties.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries))

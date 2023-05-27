@@ -47,7 +47,21 @@ public class HomeController : Controller
         var claimsIdentity = (ClaimsIdentity)User.Identity;
         var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
         shoppingCart.ApplicationUserId = userId;
-        _unitOfWork.ShoppingCart.Add(shoppingCart);
+
+        ShoppingCart shoppingCartFromDb = _unitOfWork.ShoppingCart.Get(sc => sc.ProductId == shoppingCart.ProductId && sc.ApplicationUserId == shoppingCart.ApplicationUserId);
+
+        if (shoppingCartFromDb != null)
+        {
+            //Shopping cart exists: update cart record
+            shoppingCartFromDb.Count += shoppingCart.Count;
+            _unitOfWork.ShoppingCart.Update(shoppingCartFromDb);
+        }
+        else
+        {
+            //Add cart record
+            _unitOfWork.ShoppingCart.Add(shoppingCart);
+        }
+        TempData["success"] = "Cart updated successfully"; 
         _unitOfWork.Save();
             
         return RedirectToAction(nameof(Index));
