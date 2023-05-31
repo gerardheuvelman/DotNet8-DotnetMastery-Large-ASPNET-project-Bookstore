@@ -23,4 +23,32 @@ public class OrderHeaderRepository : Repository<OrderHeader>, IOrderHeaderReposi
         _db.OrderHeaders.Update(orderHeader);
         _db.SaveChanges();
     }
+
+	public void UpdateStatus(int id, string orderStatus, string? paymentStatus = null)
+	{
+        var orderFromDb = _db.OrderHeaders.FirstOrDefault(oh => oh.Id == id);
+        if (orderFromDb != null)
+        {
+            orderFromDb.OrderStatus = orderStatus;
+            if (!string.IsNullOrEmpty(paymentStatus))
+            {
+                orderFromDb.PaymentStatus = paymentStatus;
+            }
+            _db.SaveChanges();
+        }
+	}
+
+	public void UpdateStripePaymentId(int id, string sessionId, string paymentIntentId)
+	{
+		var orderFromDb = _db.OrderHeaders.FirstOrDefault(oh => oh.Id == id);
+        if(!string.IsNullOrEmpty(sessionId))
+        {
+            orderFromDb.SessionId = sessionId;
+        }
+		if (!string.IsNullOrEmpty(paymentIntentId))
+		{
+			orderFromDb.SessionId = paymentIntentId;
+            orderFromDb.PaymentDate = DateTime.Now;
+		}
+	}
 }
