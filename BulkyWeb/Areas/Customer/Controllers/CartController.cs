@@ -176,9 +176,9 @@ namespace BulkyWeb.Areas.Customer.Controllers
             return RedirectToAction(nameof(OrderConfirmation), new { orderId= ShoppingCartVM.OrderHeader.Id }); // The parameter has to be given as an object!!
 		}
 
-        public IActionResult OrderConfirmation(int id)
+        public IActionResult OrderConfirmation(int orderId)
         {
-			OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == id, includeProperties: "ApplicationUser");
+			OrderHeader orderHeader = _unitOfWork.OrderHeader.Get(u => u.Id == orderId, includeProperties: "ApplicationUser");
             if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
             {
                 // this is a normal customer
@@ -189,7 +189,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
                 if (session.PaymentStatus.ToLower() == "paid")
                 {
 					_unitOfWork.OrderHeader.UpdateStripePaymentId(ShoppingCartVM.OrderHeader.Id, session.Id, session.PaymentIntentId); // This time, PaymentIntentId will be populated. 
-                    _unitOfWork.OrderHeader.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+                    _unitOfWork.OrderHeader.UpdateStatus(orderId, SD.StatusApproved, SD.PaymentStatusApproved);
                     _unitOfWork.Save();
 				}
             }
@@ -201,7 +201,7 @@ namespace BulkyWeb.Areas.Customer.Controllers
             _unitOfWork.Save();
 
 
-            return View(id);
+            return View(orderId);
         }
 
 		public IActionResult Plus(int cartId)
@@ -215,9 +215,11 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult Minus(int cartId)
         {
-            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(sc => sc.Id == cartId);
+            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(sc => sc.Id == cartId, tracked: true);
             if (cartFromDb.Count <= 1) 
             {
+                HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart
+                    .GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
                 _unitOfWork.ShoppingCart.Remove(cartFromDb);
             }
             else
@@ -232,7 +234,9 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
         public IActionResult Remove(int cartId)
         {
-            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(sc => sc.Id == cartId);
+            ShoppingCart cartFromDb = _unitOfWork.ShoppingCart.Get(sc => sc.Id == cartId, tracked: true); // Tracked:true is important here. As default we are loading entities without tracking them, but in this case we need to track it.
+            HttpContext.Session.SetInt32(SD.SessionCart, _unitOfWork.ShoppingCart
+                .GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count() - 1);
             _unitOfWork.ShoppingCart.Remove(cartFromDb);
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
