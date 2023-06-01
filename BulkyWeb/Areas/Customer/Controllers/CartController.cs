@@ -192,6 +192,10 @@ namespace BulkyWeb.Areas.Customer.Controllers
                     _unitOfWork.OrderHeader.UpdateStatus(orderId, SD.StatusApproved, SD.PaymentStatusApproved);
                     _unitOfWork.Save();
 				}
+
+                // Clear the number of items in the ShoppingCart Context
+                HttpContext.Session.Clear();
+
             }
 
             // empty the shopping cart
