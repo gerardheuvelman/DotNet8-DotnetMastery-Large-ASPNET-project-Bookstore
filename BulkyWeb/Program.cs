@@ -51,18 +51,13 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 // Session
 app.UseSession();
-
 SeedDatabase();
-
 app.MapRazorPages();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");

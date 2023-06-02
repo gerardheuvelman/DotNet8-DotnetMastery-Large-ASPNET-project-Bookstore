@@ -18,14 +18,13 @@ public class CompanyController : Controller
     {
         _unitOfWork = unitOfWork;
     }
-    ///////////////////////////////////////////////////////////////////////////////////
+
     public IActionResult Index()
     {
         List<Company> companyList = _unitOfWork.Company.GetAll().ToList();
         return View(companyList);
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////
 
     public IActionResult Upsert(int? id)
     {
@@ -64,7 +63,6 @@ public class CompanyController : Controller
         }
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
     
     #region API CALLS
 
@@ -74,7 +72,6 @@ public class CompanyController : Controller
         List<Company> objCompanyList = _unitOfWork.Company.GetAll().ToList();
         return Json( new { data = objCompanyList } );
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////
 
     [HttpDelete]
     public IActionResult Delete(int? id)
