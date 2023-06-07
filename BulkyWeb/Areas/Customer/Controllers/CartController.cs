@@ -31,13 +31,15 @@ namespace BulkyWeb.Areas.Customer.Controllers
 
             ShoppingCartVM = new()
             {
-                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(sc => sc.ApplicationUserId == userId, includeProperties: "Product"),
+                ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(sc => sc.ApplicationUserId == userId, includeProperties: "Product"), // We COULD als o use a ThenInclude clause to also fetch the ProductImages. but it would be over-fetching.
                 OrderHeader = new() 
             };
 
-            
+             IEnumerable<ProductImage> productImages = _unitOfWork.ProductImage.GetAll();
+
             foreach (ShoppingCart cart in ShoppingCartVM.ShoppingCartList)
             {
+                cart.Product.ProductImages = productImages.Where(u => u.ProductId == cart.Product.Id ).ToList(); // this filters the list of ProductImages to only the ones that belong to the iem in the cart. This way, there is less over-fetching.
                 cart.Price = GetPriceBasedOnQuantity(cart);
                 ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
             }

@@ -7,21 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bulky.DataAccess.Repository
+namespace Bulky.DataAccess.Repository;
+
+public class OrderDetailRepository : Repository<OrderDetail>, IOrderDetailRepository
 {
-    public class OrderDetailRepository : Repository<OrderDetail>, IOrderDetailRepository
+    private ApplicationDbContext _db;
+
+    public OrderDetailRepository(ApplicationDbContext db) : base(db)
     {
-        private ApplicationDbContext _db;
+        _db = db;
+    }
 
-        public OrderDetailRepository(ApplicationDbContext db) : base(db)
-        {
-            _db = db;
-        }
-
-        public void Update(OrderDetail orderDetail)
-        {
-            _db.OrderDetails.Update(orderDetail);
-            _db.SaveChanges();
-        }
+    public void Update(OrderDetail orderDetail)
+    {
+        _db.OrderDetails.Update(orderDetail);
+        _db.SaveChanges();
     }
 }

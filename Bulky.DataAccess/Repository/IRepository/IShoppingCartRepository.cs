@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bulky.DataAccess.Repository.IRepository
+namespace Bulky.DataAccess.Repository.IRepository;
+
+public interface IShoppingCartRepository : IRepository<ShoppingCart>
 {
-    public interface IShoppingCartRepository : IRepository<ShoppingCart>
-    {
-        void Update(ShoppingCart shoppingCart);
-    }
+    void Update(ShoppingCart shoppingCart);
 }

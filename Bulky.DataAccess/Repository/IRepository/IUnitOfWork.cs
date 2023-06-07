@@ -4,24 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bulky.DataAccess.Repository.IRepository
+namespace Bulky.DataAccess.Repository.IRepository;
+
+public interface IUnitOfWork
 {
-    public interface IUnitOfWork
-    {
-        ICategoryRepository Category { get; }
+    ICategoryRepository Category { get; }
 
-        IProductRepository Product { get; }
+    IProductRepository Product { get; }
 
-        ICompanyRepository Company { get; }
+    IProductImageRepository ProductImage { get; }
 
-        IShoppingCartRepository ShoppingCart { get; }
+    ICompanyRepository Company { get; }
 
-        IOrderHeaderRepository OrderHeader { get; }
-        IOrderDetailRepository OrderDetail { get; }
+    IShoppingCartRepository ShoppingCart { get; }
 
-        IApplicationUserRepository ApplicationUser { get; }
+    IOrderHeaderRepository OrderHeader { get; }
+    IOrderDetailRepository OrderDetail { get; }
 
+    IApplicationUserRepository ApplicationUser { get; }
 
-        void Save();
-    }
+    void Save();
 }
